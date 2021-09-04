@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spark-worker
+  labels:
+    component: spark-worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: spark-worker
+  template:
+    metadata:
+      labels:
+        component: spark-worker
+    spec:
+      containers:
+        - name: spark-worker
+          image: nikoshet/k8s-spark:spark-cherry #spark-external
+          command: ["/spark/spark-worker.sh"]
+          ports:
+            - containerPort: 8081
+          resources:
+            requests:
+              cpu: 1000m
+              memory: 2Gi
+            limits:
+            #  cpu: 1500m #"1" #500m
+              memory: 2.5Gi
+#          volumeMounts:
+#            - mountPath: data #/yellow_tripdata_1m.csv #web-BerkStan.txt #customer_complaints.csv
+#              name: csv-path
+#      volumes:
+#        - name: csv-path
+#          hostPath:
+#            # directory location on host
+#            #path: /home/ubuntu/web-BerDirekStan.txt #customer_complaints.csv
+#            path: /home/ubuntu/data-aws #yellow_tripdata_1m.csv
+#            # this field is optional
+#            type: Directory #File
+      nodeSelector:
+        type: worker
+        #kubernetes.io/hostname: nnik-3

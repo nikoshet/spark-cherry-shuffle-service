@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: metrics-monitor
+  labels:
+    component: metrics-monitor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: metrics-monitor
+  template:
+    metadata:
+      labels:
+        component: metrics-monitor
+    spec:
+      serviceAccountName: metrics-monitor-sa
+      automountServiceAccountToken: false
+      containers:
+        - name: metrics-monitor
+          image:  nikoshet/k8s-spark:metrics-monitor
+          imagePullPolicy: Never #IfNotPresent #Never
+          #ports:
+          #  - containerPort: 8080
+          resources:
+            requests:
+              cpu: 0.5
+              memory: 1Gi
+            limits:
+              #cpu: "0.5"
+              memory: 1.5Gi
+          volumeMounts:
+          - name: kubectl-binary
+            mountPath: /usr/local/bin/kubectl
+            readOnly: true
+          - name: kubectl-config
+            mountPath: /.kube/config
+            readOnly: true
+            volumes:
+      volumes:
+      - name: kubectl-binary
+        hostPath:
+          path: /usr/local/bin/kubectl
+      - name: kubectl-config
+        hostPath:
+          path: /home/ubuntu/.kube/config
+      nodeSelector:
+        type: master
+        #kubernetes.io/hostname: nnik-1

@@ -1,0 +1,44 @@
+---
+- hosts: spark-cherry-node #all #new-nodes
+  become: yes
+  become_user: root
+  gather_facts: no
+  vars_files:
+    - env_variables
+  tasks:
+  - name: Install K8s
+    shell: |
+      # Install K8s
+      curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl" # Version:1.20.1
+      chmod +x ./kubectl
+      mv ./kubectl /usr/local/bin/kubectl
+      kubectl version --client
+      # Install Docker
+      curl -fsSL https://get.docker.com -o get-docker.sh # Version:20.10.1
+      sh get-docker.sh
+      # If you want to be able to use docker as a non-root user, you can your user to the "docker" group like so:
+      sudo usermod -aG docker $USER
+      # Installing kubeadm, kubelet, kubectl
+      apt-get update && sudo apt-get install -y apt-transport-https curl
+      curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+      cat <<EOF | sudo tee /etc/apt/sources.list.d/kubernetes.list
+      deb https://apt.kubernetes.io/ kubernetes-xenial main
+      EOF
+      apt-get update
+
+  - name: Install required packages
+    apt:
+      name: "{{ kubernetes_packages }}"
+      state: present
+
+  - name: Restart services
+    shell: |
+      systemctl daemon-reload
+      systemctl restart kubelet
+
+  - name: Start and Enable the required services
+    service:
+      name: "{{ item }}"
+      state: started
+      enabled: yes
+    with_items: "{{ kubernetes_services }}"

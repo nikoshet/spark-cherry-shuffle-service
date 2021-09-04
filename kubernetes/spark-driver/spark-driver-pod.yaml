@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: spark-driver
+  labels:
+    component: spark-driver
+spec:
+  containers:
+    - name: spark-driver
+      image: nikoshet/k8s-spark:spark-v1
+      command: ["/spark/spark-driver.sh"]
+      #command: [ "/bin/bash", "-ce", "tail -f /dev/null" ]
+      ports:
+        - containerPort: 4040
+      resources:
+        requests:
+          cpu: "1"
+          memory: 1Gi
+        limits:
+          cpu: "1" #500m
+          memory: 1Gi
+      volumeMounts:
+        - mountPath: /customer_complaints.csv
+          name: csv-path
+          #subPath: customer_complaints.csv
+  volumes:
+    - name: csv-path
+      hostPath:
+        # directory location on host
+        path: /home/ubuntu/customer_complaints.csv
+        # this field is optional
+        type: File
+
+  nodeSelector:
+    kubernetes.io/hostname: nnik-1

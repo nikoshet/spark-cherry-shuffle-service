@@ -1,0 +1,11 @@
+---
+- hosts: spark-master-driver-node # spark-cherry-node #spark-worker-nodes #spark-cherry-node #all #all #
+  become: yes
+  #become_user: root
+  gather_facts: no
+  tasks:
+  - name: Pull Docker images
+    shell: |
+      sudo docker pull nikoshet/k8s-spark:spark-cherry-update #-test #thread #new #-trace #external #cherry #-gc-red-obj-cre-info #spark-cherry #external #-cherry-new-trace
+    #spark-cherry-gc-red-obj-cre
+    # sudo docker pull nikoshet/k8s-spark:spark-v5-external

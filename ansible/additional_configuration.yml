@@ -1,0 +1,3 @@
+---
+- import_playbook: playbooks/docker_login.yml
+- import_playbook: playbooks/monitoring.yml

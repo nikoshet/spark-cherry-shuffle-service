@@ -1,0 +1,26 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    #    spark-role: driver
+    release: prometheus
+    component: spark-driver
+  name: spark-driver-servicemonitor
+  namespace: default
+spec:
+  endpoints:
+    - interval: 5s
+      port: spark-ui
+      path: "/metrics/executors/prometheus/"
+    - interval: 5s
+      port: spark-ui
+      path: "/metrics/prometheus/"
+  namespaceSelector:
+    #    any: true
+    matchNames:
+      - spark #default
+  selector:
+    matchLabels:
+      #      spark-role: driver
+      #      release: prometheus
+      component: spark-driver

@@ -1,0 +1,59 @@
+# Kubernetes
+[kubernetes-master-node]
+nnik-1      ansible_host=10.0.1.174     ansible_user=ubuntu
+
+[kubernetes-worker-nodes]
+nnik-2      ansible_host=10.0.1.169     ansible_user=ubuntu
+nnik-3      ansible_host=10.0.1.145     ansible_user=ubuntu
+nnik2-17    ansible_host=10.0.1.198     ansible_user=ubuntu
+nnik2-16    ansible_host=10.0.1.195     ansible_user=ubuntu
+nnik2-15    ansible_host=10.0.1.192     ansible_user=ubuntu
+nnik2-14    ansible_host=10.0.1.171     ansible_user=ubuntu
+nnik2-13    ansible_host=10.0.1.202     ansible_user=ubuntu
+nnik2-12    ansible_host=10.0.1.175     ansible_user=ubuntu
+nnik2-11    ansible_host=10.0.1.181     ansible_user=ubuntu
+nnik2-10    ansible_host=10.0.1.144     ansible_user=ubuntu
+nnik2-9     ansible_host=10.0.1.196     ansible_user=ubuntu
+nnik2-8     ansible_host=10.0.1.191     ansible_user=ubuntu
+nnik2-7     ansible_host=10.0.1.185     ansible_user=ubuntu
+nnik2-6     ansible_host=10.0.1.193     ansible_user=ubuntu
+nnik2-5     ansible_host=10.0.1.189     ansible_user=ubuntu
+nnik2-4     ansible_host=10.0.1.188     ansible_user=ubuntu
+nnik2-3     ansible_host=10.0.1.119     ansible_user=ubuntu
+nnik2-2     ansible_host=10.0.1.183     ansible_user=ubuntu
+nnik2-1     ansible_host=10.0.1.167     ansible_user=ubuntu
+
+# TCP-DS
+[tpc-ds-worker]
+nnik2-1     ansible_host=10.0.1.167     ansible_user=ubuntu
+#nnik2-17    ansible_host=10.0.1.198     ansible_user=ubuntu
+#nnik2-16    ansible_host=10.0.1.195     ansible_user=ubuntu
+
+# Spark
+[spark-master-driver-node]
+nnik-2      ansible_host=10.0.1.169     ansible_user=ubuntu
+
+[spark-cherry-node]
+nnik-3      ansible_host=10.0.1.145     ansible_user=ubuntu
+nnik2-2     ansible_host=10.0.1.183     ansible_user=ubuntu
+nnik2-3     ansible_host=10.0.1.119     ansible_user=ubuntu
+nnik2-4     ansible_host=10.0.1.188     ansible_user=ubuntu
+nnik2-5     ansible_host=10.0.1.189     ansible_user=ubuntu
+nnik2-6     ansible_host=10.0.1.193     ansible_user=ubuntu
+nnik2-7     ansible_host=10.0.1.185     ansible_user=ubuntu
+nnik2-8     ansible_host=10.0.1.191     ansible_user=ubuntu
+nnik2-9     ansible_host=10.0.1.196     ansible_user=ubuntu
+nnik2-10    ansible_host=10.0.1.144     ansible_user=ubuntu
+nnik-2      ansible_host=10.0.1.169     ansible_user=ubuntu
+
+[spark-worker-nodes]
+nnik2-15    ansible_host=10.0.1.192     ansible_user=ubuntu
+nnik2-14    ansible_host=10.0.1.171     ansible_user=ubuntu
+nnik2-13    ansible_host=10.0.1.202     ansible_user=ubuntu
+nnik2-12    ansible_host=10.0.1.175     ansible_user=ubuntu
+nnik2-11    ansible_host=10.0.1.181     ansible_user=ubuntu
+
+# [new-nodes]
+# nnik2-17    ansible_host=10.0.1.198     ansible_user=ubuntu
+# nnik2-16    ansible_host=10.0.1.195     ansible_user=ubuntu
+# etc...

@@ -1,0 +1,16 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: spark-cherry-shuffle-service
+spec:
+  #clusterIP: "None"
+  type: ClusterIP
+  ports:
+    - name: spark-cherry-shuffle-service
+      port: 7777
+      targetPort: 7777
+    - name: spark-cherry-shuffle-service-caching-endpoint
+      port: 7788
+      targetPort: 7788
+  selector:
+    component: spark-cherry-shuffle-service

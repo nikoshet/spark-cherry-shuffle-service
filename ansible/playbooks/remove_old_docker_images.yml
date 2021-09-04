@@ -1,0 +1,23 @@
+---
+- hosts: spark-cherry-node #all
+  become: yes
+  become_user: root
+  gather_facts: no
+  tasks:
+  - name: Remove old Docker images
+    shell: |
+      sudo docker image ls|grep "<none>"|awk '$2=="<none>" {print $3}' >> images
+      sudo docker image rm $(cat images)
+      rm -rf images
+
+      sudo docker image ls|grep "spark-cherry-split-cache"|awk '$2=="spark-cherry-split-cache" {print $3}' >> images
+      sudo docker image rm $(cat images)
+      rm -rf images
+
+      sudo docker image ls|grep "spark-cherry-no-off-heap"|awk '$2=="spark-cherry-no-off-heap" {print $3}' >> images
+      sudo docker image rm $(cat images)
+      rm -rf images
+
+    #sudo docker image ls|grep "spark-cherry-test"|awk '$2=="spark-cherry-test" {print $3}' >> images
+    #sudo docker image rm $(cat images)
+    #rm -rf images

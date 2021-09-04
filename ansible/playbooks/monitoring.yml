@@ -1,0 +1,16 @@
+---
+- hosts: kubernetes-master-node
+  become: yes
+  become_user: root
+  gather_facts: no
+  tasks:
+    - name: Add monitoring packages for Kubernetes
+      shell: |
+        helm install prometheus stable/prometheus-operator
+#        curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+#        chmod 700 get_helm.sh
+#        ./get_helm.sh
+#        helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+#        helm repo add stable https://charts.helm.sh/stable
+#        helm repo update
+#        helm install prometheus stable/prometheus-operator

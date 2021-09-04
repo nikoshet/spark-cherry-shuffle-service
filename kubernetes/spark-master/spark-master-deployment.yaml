@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spark-master
+  labels:
+    component: spark-master
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: spark-master
+  template:
+    metadata:
+      labels:
+        component: spark-master
+    spec:
+      #ecurityContext:
+      #  runAsUser: 1000
+      containers:
+        - name: spark-master
+          image:  nikoshet/k8s-spark:spark-cherry
+          imagePullPolicy: Never #IfNotPresent #Never
+          #command: ["chmod 755 spark-master"]
+          #,"&&","chmod +x spark-master","&&","/spark-master"]
+          #command: ["ls"] # && /spark-master.sh"]
+          command: ["/spark/spark-master.sh"]
+          #command: [ "/bin/bash", "-ce", "tail -f /dev/null" ]
+          ports:
+            - containerPort: 7077
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: 0.5
+              memory: 1Gi
+            limits:
+              #cpu: "0.5"
+              memory: 1.5Gi
+      nodeSelector:
+        type: master-driver #master
+        #kubernetes.io/hostname: nnik-1
+      #imagePullSecrets:
+      #  - name: regcred

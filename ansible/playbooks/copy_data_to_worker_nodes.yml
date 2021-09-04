@@ -1,0 +1,30 @@
+---
+- hosts: kubernetes-master-node
+  become: yes
+  #become_user: root
+  #gather_facts: no
+  vars:
+    ansible_host_key_checking: false
+  vars_files:
+    - env_variables
+  tasks:
+    - name: Copy data for Spark workloads to Worker nodes
+      shell: |
+        scp -r web-BerkStan.txt ubuntu@{{ item }}:~/
+      # >> copy-out.txt 2>&1
+      #  scp -r data-aws ubuntu@{{ item }}:~/ >> copy-out.txt 2>&1
+      #  scp -r data-q2 ubuntu@{{ item }}:~/ >> copy-out.txt 2>&1
+      #  scp -r customer_complaints.csv ubuntu@{{ item }}:~/ >> copy-out.txt 2>&1
+      when: "item not in groups['kubernetes-spark-master-driver-node']"
+      loop: "{{ groups['kubernetes-worker-nodes'] }}"
+
+#    - name: Transfer file from ServerA to ServerB
+#      synchronize:
+#        src: ubuntu@{{ ansible_hostname }}:~/web-BerkStan.txt
+#        dest: ubuntu@{{ item }}:~/web-BerkStan.txt
+#        #mode: push
+#        #mode: pull
+#      delegate_to: "{{ ansible_hostname }}" #"{{ item }}" #ubuntu@{{ item }}
+#      when: "item not in groups['kubernetes-spark-master-driver-node']"
+#      loop: "{{ groups['kubernetes-worker-nodes'] }}"
+

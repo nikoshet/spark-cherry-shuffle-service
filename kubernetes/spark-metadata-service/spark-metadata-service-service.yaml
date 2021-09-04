@@ -1,0 +1,15 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: spark-metadata-service
+  labels:
+    component: spark-metadata-service
+spec:
+  clusterIP: "None"
+  #type: ClusterIP
+  ports:
+    - name: spark-metadata-service
+      port: 5555
+      targetPort: 5555
+  selector:
+    component: spark-metadata-service

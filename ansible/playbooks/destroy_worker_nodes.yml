@@ -1,0 +1,11 @@
+---
+- hosts: kubernetes-worker-nodes
+  become: yes
+  become_user: root
+  gather_facts: no
+  vars_files:
+    - env_variables
+  tasks:
+  - name: Leave from Kubernetes cluster
+    shell: |
+      kubeadm reset -f

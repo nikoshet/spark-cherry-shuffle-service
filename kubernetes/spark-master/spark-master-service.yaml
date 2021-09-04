@@ -1,0 +1,18 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: spark-master
+  labels:
+    component: spark-master
+spec:
+  clusterIP: "None"
+  #type: ClusterIP #NEW CHANGE
+  ports:
+    - name: spark-ui
+      port: 8080
+      targetPort: 8080
+    - name: spark
+      port: 7077
+      targetPort: 7077
+  selector:
+    component: spark-master

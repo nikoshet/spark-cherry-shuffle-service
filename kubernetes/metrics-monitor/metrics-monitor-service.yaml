@@ -1,0 +1,15 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: metrics-monitor
+  labels:
+    component: metrics-monitor
+spec:
+  clusterIP: "None"
+  #type: ClusterIP #NEW CHANGE
+  #ports:
+    #- name: -
+    #  port: 8080
+    #  targetPort: 8080
+  selector:
+    component: metrics-monitor

@@ -1,0 +1,15 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: spark-worker
+  labels:
+    component: spark-worker
+spec:
+  clusterIP: "None"
+  #type: ClusterIP
+  ports:
+    - name: spark-ui
+      port: 8081
+      targetPort: 8081
+  selector:
+    component: spark-worker

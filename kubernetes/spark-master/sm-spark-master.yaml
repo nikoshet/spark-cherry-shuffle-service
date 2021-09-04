@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    release: prometheus
+    component: spark-master
+  name: spark-master-servicemonitor
+  namespace: default
+spec:
+  endpoints:
+    - interval: 5s
+      port: spark-ui
+      path: "/metrics/master/prometheus/"
+  namespaceSelector:
+    matchNames:
+      - spark
+  selector:
+    matchLabels:
+      component: spark-master

@@ -1,0 +1,25 @@
+####################################
+# general
+packages:
+- htop
+- maven
+- default-jre
+- default-jdk
+- scala
+- python3-pip
+
+####################################
+# kubernetes
+kubernetes_packages:
+- docker
+- kubeadm
+- kubectl
+
+kubernetes_services:
+- docker
+- kubelet
+
+token_file: join_token
+control_plane: nnik-1
+cidr_v: 192.168.0.0/16
+HOME: /home/ubuntu

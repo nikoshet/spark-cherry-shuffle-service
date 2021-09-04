@@ -1,0 +1,3 @@
+---
+- import_playbook: playbooks/destroy_worker_nodes.yml
+- import_playbook: playbooks/destroy_master_node.yml

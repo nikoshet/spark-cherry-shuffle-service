@@ -1,0 +1,56 @@
+---
+- hosts: tpc-ds-worker
+  become: yes
+  become_user: root
+  gather_facts: no
+  vars_files:
+    - env_variables
+    - env_path_variables
+  tasks:
+   - name: Copy Hadoop installation file in node
+     copy: src={{ hadoop_install_file }} dest=hadoop_install.sh
+
+   - name: Copy TPC-DS Data Prep file in node
+     copy: src={{ tpcds_data_prep_file }} dest=TPCDSPreparation.scala
+
+   - name: Install HDFS
+     shell: |
+       chmod +x hadoop_install.sh
+       ./hadoop_install.sh > {{ HOME }}/hadoop_install.txt 2>&1
+     #args:
+     #  executable: /bin/bash
+
+   - name: Install DataBricks SparkSqlPerf kit
+     shell: |
+       git clone https://github.com/databricks/spark-sql-perf >> {{ HOME }}/sparksqlperf_install.txt 2>&1
+       cd spark-sql-perf
+
+       sudo update-ca-certificates -f
+       sudo /var/lib/dpkg/info/ca-certificates-java.postinst configure
+       echo "java installation ok"
+       # install sbt
+       echo "starting sbt installation"
+       apt-get install -y apt-transport-https
+       echo "deb https://dl.bintray.com/sbt/debian /" | sudo tee -a /etc/apt/sources.list.d/sbt.list
+       apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 2EE0EA64E40A89B84B2DF73499E82A75642AC823
+       apt-get update
+       apt-get install -y sbt
+
+       sbt +package >> {{ HOME }}/sparksqlperf_install.txt 2>&1
+
+   - name: Install TPCDS kit
+     shell: |
+       apt-get install gcc make flex bison byacc
+       git clone https://github.com/databricks/tpcds-kit.git
+       cd tpcds-kit/tools
+       make OS=LINUX
+       cd ..
+     args:
+       chdir: "{{ HOME }}/spark-sql-perf/"
+
+   - name: Start Data Generation
+     shell: |
+       export PYSPARK_PYTHON=python3
+       source .profile
+       spark-shell --master local[*] --deploy-mode client -i TPCDSPreparation.scala  --conf spark.driver.extraClassPath=/home/ubuntu/spark-sql-perf/target/scala-2.12/spark-sql-perf_2.12-0.5.1-SNAPSHOT.jar --conf spark.executor.extraClassPath=/home/ubuntu/spark-sql-perf/target/scala-2.12/spark-sql-perf_2.12-0.5.1-SNAPSHOT.jar
+     # spark-shell --master local[*] --deploy-mode client -i TPCDSPreparation.scala > {{ HOME }}/data_generation.txt 2>&1

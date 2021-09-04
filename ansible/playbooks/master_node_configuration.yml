@@ -1,0 +1,31 @@
+---
+- hosts: kubernetes-master-node
+  #become: yes
+  #become_user: root
+  gather_facts: no
+  vars_files:
+    - env_variables
+  tasks:
+  - name: Initialize Kubernetes Cluster
+    become: yes
+    become_user: root
+    shell: kubeadm init --control-plane-endpoint={{ control_plane }} --pod-network-cidr={{ cidr_v }}
+    register: output
+
+  - name: Debug kubeadm init output
+    debug: var=output.stdout_lines
+
+  - name: Store Logs and Generated token for future purpose.
+    local_action: copy content={{ output.stdout }} dest={{ token_file }}
+    #become: False
+
+  - name: Copy required files
+    shell: |
+      mkdir -p /home/ubuntu/.kube
+      sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config
+      sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+  - name: Install CALICO CNI Network Add-on
+    shell: |
+      kubectl create -f https://docs.projectcalico.org/manifests/tigera-operator.yaml
+      kubectl create -f https://docs.projectcalico.org/manifests/custom-resources.yaml

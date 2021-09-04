@@ -1,0 +1,54 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: spark-driver
+  labels:
+    component: spark-driver
+spec:
+  manualSelector: true
+  selector:
+    matchLabels:
+      component: spark-driver
+  template:
+    metadata:
+      labels:
+        component: spark-driver
+    spec:
+      containers:
+        - name: spark-driver
+          image: nikoshet/k8s-spark:spark-cherry #-logtrace #spark-external
+          #command: ["/spark/spark-driver.sh", "-s", "none", "-w", "tpcds", "-p", "100", "-q", "q2,q5"]
+          #command: ["/spark/spark-driver.sh", "-s", "cherry", "-w", "amazon_customer_reviews_workload_v2.py", "-z", "true", "-p", "100", "-l", "true", "-r", "7788"]
+          #command: ["/spark/spark-driver.sh", "-s", "cherry", "-w", "query2_rdd.py", "-p", "100", "-l", "true", "-r", "7788"]
+          #command: ["/spark/spark-driver.sh", "-s", "cherry", "-w", "synthetic", "-p", "1500", "-g", "5", "-l", "true", "-r", "7788", "-z", "true"] #Distributed + caching
+          #command: ["/spark/spark-driver.sh", "-s", "cherry", "-w", "synthetic", "-p", "2000", "-g", "20", "-l", "true", "-r", "7788", "-z", "true"] #Distributed + caching
+          command: [ "/spark/spark-driver.sh", "-s", "cherry", "-w", "skew", "-p", "2000", "-g", "20", "-l", "true", "-r", "7788", "-z", "true", "-k", "0.8"] #Distributed + caching
+          #command: ["/spark/spark-driver.sh", "-s", "cherry", "-w", "synthetic", "-p", "1500", "-g", "5", "-l", "true", "-r", "7788"] #Distributed + no caching
+          #command: ["/spark/spark-driver.sh", "-s", "none", "-w", "synthetic", "-p", "1500", "-g", "5"]
+          #command: [ "/bin/bash", "-ce", "tail -f /dev/null" ]
+          ports:
+            - containerPort: 4040
+          resources:
+            requests:
+              cpu: 1000m
+              memory: 1Gi
+            limits:
+              #cpu: 1500m #500m
+              memory: 1.5Gi
+#          volumeMounts:
+#            - mountPath: /data #yellow_tripdata_1m.csv #web-BerkStan.txt #customer_complaints.csv
+#              name: csv-path
+      restartPolicy: Never
+#      volumes:
+#        - name: csv-path
+#          hostPath:
+#            # directory location on host
+#            #path: /home/ubuntu/web-BerkStan.txt #customer_complaints.csv
+#            path: /home/ubuntu/data-aws #yellow_tripdata_1m.csv
+#            # this field is optional
+#            type: Directory #File
+
+      nodeSelector:
+        type: master-driver #master
+        #kubernetes.io/hostname: nnik-1
+  backoffLimit: 1

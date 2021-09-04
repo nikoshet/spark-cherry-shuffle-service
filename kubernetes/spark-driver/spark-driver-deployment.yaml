@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spark-driver
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: spark-driver
+  template:
+    metadata:
+      labels:
+        component: spark-driver
+    spec:
+      containers:
+        - name: spark-driver
+          image: nikoshet/k8s-spark:spark-cherry-new #-new for tpcds benchmark+bug in DAGScheduler line 1600 from tpcds q1 running
+          command: [ "/spark/spark-driver.sh", "-s", "cherry", "-w", "tpcds", "-p", "2000", "-q", "q1", "-l", "true", "-r", "7788", "-z", "true"]
+          #"-p", "20","-l", "true", "-r", "7788", "-z", "true", "-k", "0.8"] #Distributed + caching
+          #command: ["/spark/spark-driver.sh"]
+          #command: [ "/bin/bash", "-ce", "tail -f /dev/null" ]
+          ports:
+            - containerPort: 4040
+            #- containerPort: 5000
+          resources:
+            requests:
+              cpu: "1"
+              memory: 1Gi
+            limits:
+              #cpu: "1" #500m
+              memory: 1.5Gi
+      #          volumeMounts:
+      #            - mountPath: /customer_complaints.csv
+      #              name: csv-path
+      #              #subPath: customer_complaints.csv
+      #      volumes:
+      #        - name: csv-path
+      #          hostPath:
+      #            # directory location on host
+      #            path: /home/ubuntu/customer_complaints.csv
+      #            # this field is optional
+      #            type: File
+
+      nodeSelector:
+        type: master-driver
+        ##node: driver
+        #kubernetes.io/hostname: nnik-1

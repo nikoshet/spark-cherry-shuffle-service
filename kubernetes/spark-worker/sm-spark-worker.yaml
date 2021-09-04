@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    release: prometheus
+    component: spark-worker
+  name: spark-worker-servicemonitor
+  namespace: default
+spec:
+  endpoints:
+    - interval: 5s
+      port: spark-ui
+      path: "/metrics/prometheus/"
+  namespaceSelector:
+    matchNames:
+      - spark
+  selector:
+    matchLabels:
+      component: spark-worker

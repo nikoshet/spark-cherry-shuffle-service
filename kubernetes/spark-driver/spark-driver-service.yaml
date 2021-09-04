@@ -1,0 +1,18 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: spark-driver
+  labels:
+    component: spark-driver
+spec:
+  clusterIP: "None"
+  #type: ClusterIP
+  ports:
+    - name: spark-ui
+      port: 4040
+      targetPort: 4040
+    #- name: spark-driver
+    #  port: 5000
+    #  targetPort: 5000
+  selector:
+    component: spark-driver

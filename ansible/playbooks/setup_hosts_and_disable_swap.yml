@@ -1,0 +1,27 @@
+---
+- hosts: all
+  #become: yes
+  #remote_user: roor
+  #vars_files:
+  #  - env_variables
+  tasks:
+  - name: Disable Swap on each node
+    shell: swapoff -a
+
+  - name: Comment Swap entries in path /etc/fstab
+    replace:
+      path: /etc/fstab
+      regexp: '(.*swap*)'
+      replace: '#\1'
+
+  - name: Add IPs to path /etc/hosts on each node
+    become: yes
+    become_user: root
+    #become_method: su
+    lineinfile:
+      dest: /etc/hosts
+      regexp: '.*{{ item }}$'
+      line: "{{ hostvars[item].ansible_host }} {{item}}"
+      state: present
+    when: hostvars[item].ansible_host is defined
+    with_items: "{{ groups.all }}"

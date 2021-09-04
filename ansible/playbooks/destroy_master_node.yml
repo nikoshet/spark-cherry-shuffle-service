@@ -1,0 +1,17 @@
+---
+- hosts: kubernetes-master-node
+  become: yes
+  become_user: root
+  #gather_facts: no
+  vars_files:
+    - env_variables
+  tasks:
+  - name: Destroy master node
+    shell: |
+      sudo kubeadm reset -f
+    #  sudo kubectl drain {{ item }} --delete-local-data --force --ignore-daemonsets
+    #  kubectl delete node {{ item }}
+    #  sudo kubeadm reset -f
+    #when: "item != ansible_hostname"
+    #with_items:
+    #-  "{{groups['kubernetes-worker-nodes']}}"

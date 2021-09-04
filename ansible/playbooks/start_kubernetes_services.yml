@@ -1,0 +1,42 @@
+---
+- hosts: kubernetes-master-node
+  become: yes
+  become_user: root
+  gather_facts: no
+  vars_files:
+    - env_variables
+  tasks:
+    - name: Label Kubernetes node that will run Spark Master and Spark Driver(Gateway)
+      shell: |
+        kubectl --kubeconfig .kube/config label nodes nnik-2 type=master-driver
+
+    - name: Label Kubernetes node that will run Cherry Shuffle Service
+      shell: |
+        kubectl --kubeconfig .kube/config label nodes nnik-3 type=cherry
+
+    - name: Label Kubernetes nodes that will run Spark Workers
+      shell: "kubectl --kubeconfig .kube/config label nodes {{ item }} type=worker"
+      #when: "item not in  groups['kubernetes-spark-master-driver-node']"
+      loop: "{{ groups['spark-worker-nodes'] }}"
+
+    - name: Create Spark namespace
+      shell: |
+        kubectl --kubeconfig .kube/config create namespace spark
+
+    - name: Start Spark services
+      shell: |
+        kubectl --kubeconfig {{ HOME }}/.kube/config create -f ./kubernetes/spark-master/spark-master-service.yaml --namespace=spark
+        kubectl --kubeconfig {{ HOME }}/.kube/config create -f ./kubernetes/spark-cherry-shuffle-service/spark-cherry-shuffle-service-service.yaml --namespace=spark
+        kubectl --kubeconfig {{ HOME }}/.kube/config create -f ./kubernetes/spark-worker/spark-worker-service.yaml --namespace=spark
+        kubectl --kubeconfig {{ HOME }}/.kube/config create -f ./kubernetes/spark-metadata-service/spark-metadata-service-service.yaml --namespace=spark
+        kubectl --kubeconfig {{ HOME }}/.kube/config create -f ./kubernetes/spark-driver/spark-driver-service.yaml --namespace=spark
+      args:
+        chdir: "{{ HOME }}/k8s-spark-with-remote-shuffle-service/"
+
+    - name: Start services for Prometheus to scrape Spark metrics
+      shell: |
+        kubectl --kubeconfig {{ HOME }}/.kube/config create -f ./kubernetes/spark-master/sm-spark-master.yaml
+        kubectl --kubeconfig {{ HOME }}/.kube/config create -f ./kubernetes/spark-worker/sm-spark-worker.yaml
+        kubectl --kubeconfig {{ HOME }}/.kube/config create -f ./kubernetes/spark-driver/sm-spark-driver.yaml
+      args:
+        chdir: "{{ HOME }}/k8s-spark-with-remote-shuffle-service/"

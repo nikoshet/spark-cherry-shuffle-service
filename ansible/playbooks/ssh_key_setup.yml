@@ -1,0 +1,53 @@
+---
+- name: Exchange Keys between servers
+  #become: yes
+  #become_user: root
+  hosts: all
+  tasks:
+    - name: SSH KeyGen command
+      shell: "ssh-keygen -q -b 2048 -t rsa -N '' -f ~/.ssh/id_rsa"
+      args:
+        creates: "~/.ssh/id_rsa" #if it file exists, it will not be overwritten
+
+    - name: Fetch the keyfile from each node
+      fetch:
+        src: "~/.ssh/id_rsa.pub"
+        dest: "buffer/{{ansible_hostname}}-id_rsa.pub"
+        flat: yes
+
+    - name: Copy the file from master to each node
+      become: yes
+      become_user: root
+      copy:
+        src: "buffer/{{item}}-id_rsa.pub"
+        dest: "/tmp/{{item}}-id_rsa.pub"
+      when: "item != ansible_hostname"
+      with_items:
+        -  "{{groups.all}}" #"{{groups['ssh-keygen-host-test']}}"
+
+    - name: Add the public key of each node into authorized_keys file to enable Key Auth
+      #become: yes
+      #become_user: root
+      #shell: "cat /tmp/{{item}}-id_rsa.pub >> ~/.ssh/authorized_keys && rm /tmp/{{item}}-id_rsa.pub"
+      # grep -q '{{item}}' ~/.ssh/authorized_keys &&
+      #shell: "sed -e '/{{item}}/{r /tmp/{{item}}-id_rsa.pub' -e 'd}' ~/.ssh/authorized_keys || cat /tmp/{{item}}-id_rsa.pub >> ~/.ssh/authorized_keys && rm /tmp/{{item}}-id_rsa.pub"
+      #sed "s|.*{{item}}.*|$(< /tmp/{{item}}-id_rsa.pub)|" ~/.ssh/authorized_keys || cat /tmp/{{item}}-id_rsa.pub >> ~/.ssh/authorized_keys
+      shell: |
+        if grep {{item}} ~/.ssh/authorized_keys; then
+          sed -i '/{{item}}$/d' ~/.ssh/authorized_keys
+          cat /tmp/{{item}}-id_rsa.pub >> ~/.ssh/authorized_keys
+        else
+          cat /tmp/{{item}}-id_rsa.pub >> ~/.ssh/authorized_keys
+        fi
+      #register: addtoauth
+      when: "item != ansible_hostname"
+      with_items:
+        -  "{{groups.all}}" #"{{groups['ssh-keygen-host-test']}}"
+
+    - name: Remove tmp files with pub keys
+      become: yes
+      become_user: root
+      shell: "rm -rf /tmp/{{item}}-id_rsa.pub"
+      when: "item != ansible_hostname"
+      with_items:
+        -  "{{groups.all}}" #"{{groups['ssh-keygen-host-test']}}"

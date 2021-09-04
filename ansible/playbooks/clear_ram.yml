@@ -1,0 +1,15 @@
+---
+- hosts: all
+  become: yes
+  become_user: root
+  gather_facts: no
+  tasks:
+  - name: Clear RAM
+    #command: sync; echo 3 > /proc/sys/vm/drop_caches ; exit
+    #become_method: su
+    #become_flags: '-s /bin/sh'
+    #become: true
+    shell: |
+      sudo su <<< "sync; echo 3 > /proc/sys/vm/drop_caches"
+    args:
+      executable: /bin/bash

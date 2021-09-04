@@ -1,0 +1,17 @@
+---
+- hosts: kubernetes-worker-nodes #new-nodes
+  become: yes
+  become_user: root
+  gather_facts: no
+  vars_files:
+    - env_variables
+  tasks:
+    - name: Copy token to worker nodes
+      copy: src={{ token_file }} dest=join_token
+
+    - name: Join worker nodes with kubernetes master
+      shell: | #"`grep -i 'kubeadm join' join_token`"
+        kubeadm reset -f
+        cat join_token | tail -2 > out.sh
+        sh out.sh
+        rm -rf out.sh

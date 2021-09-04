@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spark-cherry-shuffle-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: spark-cherry-shuffle-service
+  template:
+    metadata:
+      labels:
+        component: spark-cherry-shuffle-service
+    spec:
+      containers:
+        - name: spark-cherry-shuffle-service
+          image: nikoshet/k8s-spark:spark-cherry #spark-cherry-gc-red-obj-cre-info #-new #-trace #gc-red-obj-cre-info #new #-logtrace #test #-guava #split-cache
+          #command:  ["/spark/spark-cherry-shuffle-service.sh", "-z", "false", "-l", "true", "-r", "7788", "-s", "1000"] #s: max KV number
+          command:  ["/spark/spark-cherry-shuffle-service.sh", "-z", "true", "-l", "true", "-r", "7788", "-s", "150000", "-g", "true"]
+          #command:  ["/spark/spark-cherry-shuffle-service.sh", "-z", "true"] #Distributed + no caching
+          #["/shuffle-service/spark-cherry-shuffle-service.sh"]
+          #command: [ "/bin/bash", "-ce", "tail -f /dev/null" ]
+          ports:
+            - containerPort: 7777
+            - containerPort: 7788
+          resources:
+            requests:
+              cpu: 2
+              memory: 6.5Gi
+            limits:
+              #cpu: "0.5" #500m
+              memory: 7Gi
+      nodeSelector:
+        #node: cherry-shuffle-service
+        type: cherry
+        #kubernetes.io/hostname: nnik-1
+#          volumeMounts:
+#            - mountPath: "/eventlog"
+#              name: pv-logging
+#      volumes:
+#        - name: pv-logging
+#          persistentVolumeClaim:
+#            claimName: pv-log-claim

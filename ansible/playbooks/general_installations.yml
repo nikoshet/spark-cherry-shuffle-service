@@ -1,0 +1,52 @@
+---
+- hosts: all #new-nodes
+  become: yes
+  become_user: root
+  gather_facts: no
+  vars_files:
+    - env_variables
+  tasks:
+  - name: Update all packages
+    shell: |
+      apt-get update
+
+  - name: Upgrade packages
+    apt: upgrade=full
+
+  - name: Remove useless packages from the cache
+    apt:
+      autoclean: yes
+
+  - name: Remove dependencies that are no longer required
+    apt:
+      autoremove: yes
+
+  - name: Install required packages/libraries
+    apt:
+      name: "{{ packages }}"
+      state: present
+
+  - name: Setup Java
+    shell: |
+      echo 'JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/"' >> /etc/environment
+      echo 'export JAVA_HOME' >> /etc/environment
+      echo '.  /etc/environment' >> ~\.bash_profile
+      export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/
+
+  - name: Commands setup old python version before removing it
+    shell: |
+      rm /usr/bin/python3
+      ln -s python3.5 /usr/bin/python3
+
+  - name: Add deadsnakes repo to download Python 3.7
+    apt_repository: repo="ppa:deadsnakes/ppa"
+    become: true
+
+  - name: Install required Python packages
+    shell: |
+      apt-get update
+      apt install python3.7 -y
+      rm /usr/bin/python3
+      ln -s python3.7 /usr/bin/python3
+      pip3 install pyspark numpy
+      python3 -m pip install --upgrade pi
